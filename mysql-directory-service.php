@@ -89,8 +89,11 @@ class MysqlDirectoryService {
 		//	Hook that loads plugin translation.
 		add_action('plugins_loaded', array(&$this, 'load_textdomain'));
 		
-		//	Hook to init certain late stage settings.
-		add_action('init', array(&$this, 'init'));
+		//	Hook to handles UPME integration.
+		add_action('plugins_loaded', array(&$this, 'plugin_integration_upme'));
+		
+		//	Hook to handles Woocommerce integration.
+		add_action('plugins_loaded', array(&$this, 'plugin_integration_woocommerce'));
 		
 		//	Hook for administration pages.
 		add_action('admin_init', array(&$this, 'register_settings'));
@@ -219,9 +222,9 @@ class MysqlDirectoryService {
 	}
 	
 	/**
-	 *	Late stage init (ie: for action requiring that Wordpress has loaded plugins).
+	 *	Method that hooks into UPME plugin for integration.
 	 */
-	public function init() {
+	public function plugin_integration_upme() {
 		
 		//	Required for the plugins detection functions.
 		if ( ! function_exists( 'get_plugins' ) ) {
@@ -257,6 +260,24 @@ class MysqlDirectoryService {
 			add_action('wp_ajax_validate_register_username', array($this, 'disable_upme_ajax'), 1);
 			add_action('wp_ajax_nopriv_validate_register_username', array($this, 'disable_upme_ajax'), 1);
 			
+		}
+		
+	}
+	
+	/**
+	 *	Method that hooks into Woocommerce plugin for integration.
+	 */
+	public function plugin_integration_woocommerce() {
+		
+		//	Required for the plugins detection functions.
+		if ( ! function_exists( 'get_plugins' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
+		
+		//	Retransmits woocommerce hook to standard Wordpress hook.
+		if( is_plugin_active('woocommerce/woocommerce.php') ) {
+			add_filter('woocommerce_registration_errors', array(&$this, 'registration_errors'), 10, 3);
+			add_action('woocommerce_created_customer', array(&$this, 'woocommerce_created_customer'), 10, 3);
 		}
 		
 	}
@@ -465,7 +486,7 @@ class MysqlDirectoryService {
 	}
 	
 	/**
-	 *	Creates user profile in external database..
+	 *	Creates user profile in external database.
 	 */
 	public function create_user( $user_id ) {
 	
@@ -501,7 +522,7 @@ class MysqlDirectoryService {
 	}
 	
 	/**
-	 *	Updates user profile in external database..
+	 *	Updates user profile in external database.
 	 */
 	public function update_user( $user_id ) {
 		$update = true;
@@ -509,6 +530,18 @@ class MysqlDirectoryService {
 		$errors = new WP_Error();
 		return $this->sync_back( $errors, $user, $update );
 	}
+	
+	/**
+	 *	Creates a user profile in external database when Woocommerce creates a customer.
+	 */
+	public function woocommerce_created_customer( $customer_id, $new_customer_data, $password_generated ) {
+		$update = false;
+		$user = get_user_by('id', $customer_id);
+		$this->_user_pass = $new_customer_data['password'];
+		$errors = new WP_Error();
+		return $this->sync_back( $errors, $user, $update );
+	}
+	
 	
 	/**
 	 *	Function that creates/updates a user record in external database.

@@ -1,3 +1,6 @@
+Version 1.0.5 (2015-10-23)
+* New Feature	:	Woocommerce support for creating users when new customer is created.
+
 Version 1.0.5 (2015-10-22)
 * Optimization	:	Optimized UPME redirect.
 
