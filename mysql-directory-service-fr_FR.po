@@ -1,0 +1,366 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: external-db-auth-reloaded\n"
+"POT-Creation-Date: 2015-09-10 10:24-0400\n"
+"PO-Revision-Date: 2015-09-10 10:24-0400\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fr_CA\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.4\n"
+"X-Poedit-Basepath: .\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Poedit-KeywordsList: __;_e\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-SearchPath-0: mysql-directory-service.php\n"
+
+#: mysql-directory-service.php:271 mysql-directory-service.php:883
+#: mysql-directory-service.php:935
+msgid "Username must be provided."
+msgstr "Veuillez indiquer un nom d'utilisateur."
+
+#: mysql-directory-service.php:335
+msgid "Error while updating/creating user: no values to store in record."
+msgstr ""
+"Erreur lors de la création/mise à jour du compte: aucune valeur n'a été "
+"fournie."
+
+#: mysql-directory-service.php:356 mysql-directory-service.php:418
+msgid ""
+"This plugin must be activated on the entire network. Please contact your "
+"network administrator."
+msgstr ""
+"Ce plugiciel doit être activé sur tous le réseau. Veuillez contacter votre "
+"administrateur de réseau."
+
+#: mysql-directory-service.php:361
+msgid "Error while executing query on external database:"
+msgstr "Erreur lors de l'exécution d'une requête sur la base de données:"
+
+#: mysql-directory-service.php:365
+msgid "Error while updating external database account:"
+msgstr "Erreur lors de la mise à jour du compte dans la base de données:"
+
+#: mysql-directory-service.php:465 mysql-directory-service.php:470
+msgid "Mysql Settings"
+msgstr "Paramètres Mysql"
+
+#: mysql-directory-service.php:484
+msgid "Settings saved"
+msgstr "Paramètres sauvegardés"
+
+#: mysql-directory-service.php:489
+msgid "Mysql Authentication Service Settings"
+msgstr "Paramètres du service d'authentification Mysql"
+
+#: mysql-directory-service.php:494
+msgid "You do not have permission to edit settings here."
+msgstr "Vous n'avez pas les droits pour modifier les paramètres."
+
+#: mysql-directory-service.php:502
+msgid "General Settings"
+msgstr "Paramètres généraux"
+
+#: mysql-directory-service.php:508 mysql-directory-service.php:523
+msgid "Allow Network Login"
+msgstr "Permettre la connection pour tous le réseau"
+
+#: mysql-directory-service.php:510
+msgid ""
+"When checked, enables users to authenticate using this service. This can be "
+"turned-off individually on each blog. If unchecked, authentication is "
+"disabled on the entire network reguardless of blog settings."
+msgstr ""
+"Lorsque sélectionnée, cette option active l'authentification via le service "
+"de base de données externe sur tous le réseau. L'authentification peut "
+"ensuite être désactivée individuellement sur chacun des sites. Si cette case "
+"est décochée, l'authentification sera désactivée pour tous le réseau."
+
+#: mysql-directory-service.php:513 mysql-directory-service.php:538
+#: mysql-directory-service.php:561
+msgid "UPME Integration"
+msgstr "Intégration avec UPME"
+
+#: mysql-directory-service.php:515 mysql-directory-service.php:563
+msgid ""
+"When checked, activates UPME handling by this plugin (including blog-"
+"specific settings). This SHOULD be left checked if you are using UPME."
+msgstr ""
+"Lorsque sélectionnée, cette option active l'intégration avec UPME (incluant "
+"les paramètres spécifiques à chacun des sites). Cette case devrait toujours "
+"être cochée si vous utilisez UPME."
+
+#: mysql-directory-service.php:524
+msgid ""
+"Mysql authentication is currently turned-off for the entire network. Contact "
+"your administrator for more details."
+msgstr ""
+"L'authentification Mysql est actuellement désactivée pour tous le réseau. "
+"Veuillez contactez l'administrateur pour plus de détails."
+
+#: mysql-directory-service.php:530 mysql-directory-service.php:556
+msgid "Allow Login"
+msgstr "Activer l'authentification"
+
+#: mysql-directory-service.php:532 mysql-directory-service.php:558
+msgid "When checked, activates Mysql database authentication for this site."
+msgstr ""
+"Lorsque sélectionnée, cette option active l'authentification via la base de "
+"données Mysql pour ce site."
+
+#: mysql-directory-service.php:539
+msgid ""
+"UPME integration is currently deactivated on entire network. Contact "
+"administrator for details."
+msgstr ""
+"L'intégration UPME est actuellement désactivée pour tous le réseau. Veuillez "
+"contacter votre administrateur."
+
+#: mysql-directory-service.php:546 mysql-directory-service.php:566
+msgid "UPME Redirect"
+msgstr "Redirection UPME"
+
+#: mysql-directory-service.php:548 mysql-directory-service.php:568
+msgid ""
+"When checked, users will be redirected to their profile page after login if "
+"some of their required UPME profile fields are not set."
+msgstr ""
+"Lorsque sélectionnée, cette option redirige les utilisateurs authentifiés "
+"vers leur page de profile si certains champs requis par UPME n'ont pas été "
+"remplis."
+
+#: mysql-directory-service.php:579
+msgid "Mysql Database Connection"
+msgstr "Connection à Mysql"
+
+#: mysql-directory-service.php:582
+msgid "Host"
+msgstr "Hôte"
+
+#: mysql-directory-service.php:584
+msgid "Server hostname or IP address."
+msgstr "URL ou adresse IP du serveur."
+
+#: mysql-directory-service.php:587
+msgid "Port"
+msgstr "Port"
+
+#: mysql-directory-service.php:589
+msgid "Leave empty to use the default port."
+msgstr "Laissez vide pour utiliser le port par défaut."
+
+#: mysql-directory-service.php:592
+msgid "Database"
+msgstr "Base de données"
+
+#: mysql-directory-service.php:594
+msgid "Database name."
+msgstr "Nom de la base de données."
+
+#: mysql-directory-service.php:597 mysql-directory-service.php:616
+msgid "Username"
+msgstr "Utilisateur"
+
+#: mysql-directory-service.php:599
+msgid "Account used for Mysql connections."
+msgstr "Compte utilisé pour la connection à Mysql."
+
+#: mysql-directory-service.php:602 mysql-directory-service.php:621
+msgid "Password"
+msgstr "Mot de passe"
+
+#: mysql-directory-service.php:604
+msgid "Account password."
+msgstr "Mot de passe du compte."
+
+#: mysql-directory-service.php:607
+msgid "User table"
+msgstr "Table"
+
+#: mysql-directory-service.php:609
+msgid "Name of the table containing Wordpress user data."
+msgstr "Nom de la table contenant les données des utilisateurs."
+
+#: mysql-directory-service.php:613
+msgid "Field Mappings"
+msgstr "Mappage des champs"
+
+#: mysql-directory-service.php:626
+msgid "First name"
+msgstr "Prénom"
+
+#: mysql-directory-service.php:631
+msgid "Last name"
+msgstr "Nom"
+
+#: mysql-directory-service.php:636
+msgid "Email"
+msgstr "Courriel"
+
+#: mysql-directory-service.php:748 mysql-directory-service.php:753
+msgid ""
+"The authentication service where your account is hosted is currently "
+"deactivated for this site."
+msgstr ""
+"Le service d'authentification duquel provient votre compte est actuellement "
+"désactivé sur ce site."
+
+#: mysql-directory-service.php:758
+msgid ""
+"The authentication service where your account is hosted is currently "
+"deactivated for this network."
+msgstr ""
+"Le service d'authentification duquel provient votre compte est actuellement "
+"désactivé sur le réseau."
+
+#: mysql-directory-service.php:784
+msgid "Invalid password."
+msgstr "Mot de passe invalide."
+
+#: mysql-directory-service.php:844
+msgid ""
+"User registration is not available from this site, so you can't create an "
+"account or retrieve your password from here. See the message above."
+msgstr ""
+"L'auto-enregistrement n'est pas permise pour ce site, vous ne pouvez donc "
+"pas vous créer un compte ou récupérer votre mot de passe ici. Voire le "
+"message ci-dessus."
+
+#: mysql-directory-service.php:845
+msgid "Log In"
+msgstr "Connection"
+
+#: mysql-directory-service.php:848
+msgid "Are you lost?"
+msgstr ""
+
+#: mysql-directory-service.php:848
+#, php-format
+msgid "&larr; Back to %s"
+msgstr "&larr; Retourner à %s"
+
+#: mysql-directory-service.php:884 mysql-directory-service.php:936
+msgid "Email address must be provided."
+msgstr "L'adresse courriel doit être fournie."
+
+#: mysql-directory-service.php:889 mysql-directory-service.php:902
+#: mysql-directory-service.php:941 mysql-directory-service.php:954
+#: mysql-directory-service.php:1000 mysql-directory-service.php:1013
+msgid "Error while accessing database."
+msgstr "Erreur lors de l'accès à la base de données."
+
+#: mysql-directory-service.php:896 mysql-directory-service.php:948
+#: mysql-directory-service.php:1004
+msgid "This username is already in use."
+msgstr "Ce nom d'utilisateur est déjà utilisé."
+
+#: mysql-directory-service.php:905 mysql-directory-service.php:957
+#: mysql-directory-service.php:1016
+msgid "This email address is already in use."
+msgstr "Cette adresse courriel est déjà utilisée."
+
+#: mysql-directory-service.php:975
+msgid "Could not find user in Wordpress database."
+msgstr "L'utilisateur est introuvable dans la base de données Wordpress."
+
+#: mysql-directory-service.php:1054
+msgid "Authentication service"
+msgstr "Service d'authentification"
+
+#: mysql-directory-service.php:1060
+msgid "Authentication service for this account."
+msgstr "Service d'authentification pour ce compte."
+
+#: mysql-directory-service.php:1072
+msgid "Authentication"
+msgstr "Authentification"
+
+#: mysql-directory-service.php:1198
+msgid ""
+"The \"lastname\", \"firstname\" et \"email\" values come from a read-only "
+"source and cannot be edited from this form."
+msgstr ""
+"Les champs «nom», «prénom» et «courriel» de ce profile proviennent d'une "
+"source externe en lecture-seule et ne peuvent être modifiés ici."
+
+#: mysql-directory-service.php:1275
+msgid "Please complete your profile before proceeding."
+msgstr "Veuillez compléter votre profile avant de continuer."
+
+#~ msgid "Database Settings"
+#~ msgstr "Paramètres"
+
+#~ msgid "Database Connection Settings"
+#~ msgstr "Paramètres de connection à la base de données"
+
+#~ msgid "Error while connecting to external database"
+#~ msgstr "Erreur lors de la connection à la base de données."
+
+#~ msgid ""
+#~ "<strong>ERROR:</strong> External database authentication was deactivated "
+#~ "for this site."
+#~ msgstr ""
+#~ "<strong>ERROR:</strong> External database authentication was deactivated "
+#~ "for this site."
+
+#~ msgid ""
+#~ "The «lastname», «firstname» et «email» values come from a read-only "
+#~ "source and cannot be edited from this form."
+#~ msgstr ""
+#~ "Les champs «nom», «prénom» et «courriel» de ce profile proviennent d'une "
+#~ "source externe en lecture-seule et ne peuvent être modifiés ici."
+
+#~ msgid ""
+#~ "Authentication service for this account (enter FQDN, such as \"sim."
+#~ "umontreal.ca\")."
+#~ msgstr "Service d'authentification pour ce compte."
+
+#~ msgid "This username is already in use"
+#~ msgstr "Ce nom d'utilisateur est déjà utilisé."
+
+#~ msgid "This username is already taken."
+#~ msgstr "Ce nom d'utilisateur est déjà pris."
+
+#~ msgid "This email address is already taken."
+#~ msgstr "Cette adresse courriel est déjà prise."
+
+#~ msgid "External Database Fields"
+#~ msgstr "Mappage des champs"
+
+#~ msgid "required"
+#~ msgstr "requis"
+
+#~ msgid "(often localhost)"
+#~ msgstr "(habituellement localhost)"
+
+#~ msgid "Leave empty if using the default port."
+#~ msgstr "Laissez vide pour utiliser le port par défaut."
+
+#~ msgid "External Database Connection"
+#~ msgstr "Connection Mysql"
+
+#~ msgid ""
+#~ "When checked, users will be redirected to their profile page after login "
+#~ "if some of their required profile fields are not set."
+#~ msgstr "Lorsque sélectionnée, cette"
+
+#~ msgid "Check to activate Mysql database authentication for this site."
+#~ msgstr "Sélectionner pour"
+
+#~ msgid "Uncheck to disable external database users to login to this site."
+#~ msgstr ""
+#~ "Désélectionnez pour désactiver l'authentification via la base de données "
+#~ "externe sur ce site."
+
+#~ msgid "External Database Authentication Settings"
+#~ msgstr "Paramètres d'authentification externe"
+
+#~ msgid ""
+#~ "This plugin cannot be activated on a single site. Please contact your "
+#~ "network administrator."
+#~ msgstr "Ce plugiciel ne peut être activé"
+
+#~ msgid "Error while connecting to external database:<br/>"
+#~ msgstr "Erreur lors de la connection à la base de données externe.<br/>"

@@ -1,0 +1,18 @@
+Version 1.0.5 (2015-10-22)
+* Optimization	:	Optimized UPME redirect.
+
+Version 1.0.4 (2015-10-14)
+* Fix			:	Users can now be added to Wordpress via admin panel when they already exist in external database.
+* New Feature	:	Implemented the "read_user_records" filter hook.
+
+Version 1.0.2 (2015-09-01)
+* New Feature	:	Password change is now implemented.
+
+Version 1.0.1 (2015-09-01)
+* Fix	:	Fixed incomplete profile redirection for admin users.
+
+Version 1.0.0 (2015-09-01)
+* New feature	:	First implementation.
+* TODO			:	Change globals to members.
+* TODO			:	Address third-party plugin-specific code integration.
+
