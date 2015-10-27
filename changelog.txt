@@ -1,5 +1,6 @@
-Version 1.0.5 (2015-10-23)
+Version 1.0.6 (2015-10-23)
 * New Feature	:	Woocommerce support for creating users when new customer is created.
+* Fix			:	Fixed issue that caused non-mysqlds users to alway authenticate regardless of input password.
 
 Version 1.0.5 (2015-10-22)
 * Optimization	:	Optimized UPME redirect.

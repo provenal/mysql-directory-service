@@ -36,6 +36,7 @@ class MysqlDirectoryService {
 	
 	public $errors;
 	public $opts;
+	public $modules = array();
 	
 	protected $_loglevel = 6;
 	protected $_logfile = 6;
@@ -161,9 +162,24 @@ class MysqlDirectoryService {
 		add_filter( 'manage_users_columns', array(&$this, 'manage_users_columns'), 1, 1 );
 		add_filter( 'manage_users_custom_column', array(&$this, 'manage_users_custom_column'), 1, 3 );
 		
+		//	PHP Session handling.
+		add_action('init', array(&$this, 'session_start'), 1);
+		add_action('wp_logout', array(&$this, 'session_destroy'));
+		add_action('wp_login', array(&$this, 'session_destroy'));
 		
 	}
 	
+
+	public function session_start() {
+		if(!session_id()) {
+			session_start();
+		}
+	}
+
+	public function session_destroy() {
+		session_destroy ();
+	}
+
 	/**
 	 *	Logs string to log file.
 	 */
@@ -173,7 +189,7 @@ class MysqlDirectoryService {
 		//}
 		//if (WP_DEBUG) {
 			if ($fh = fopen($this->_logfile,'a+')) {
-				fwrite($fh,'[' .$level . '] '.$info."\n");
+				fwrite($fh, date('Y-m-d H:i:s') . ' [' .$level . '] '.$info."\n");
 				fclose($fh);
 			}
 		//}		
@@ -273,11 +289,18 @@ class MysqlDirectoryService {
 		if ( ! function_exists( 'get_plugins' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/plugin.php';
 		}
-		
-		//	Retransmits woocommerce hook to standard Wordpress hook.
+
 		if( is_plugin_active('woocommerce/woocommerce.php') ) {
+		
+			//	Retransmits woocommerce hook to standard Wordpress hook.
 			add_filter('woocommerce_registration_errors', array(&$this, 'registration_errors'), 10, 3);
 			add_action('woocommerce_created_customer', array(&$this, 'woocommerce_created_customer'), 10, 3);
+			
+			//	Synchronizes some woocommerce fields with profile fields.
+			add_action('wp_login', array(&$this, 'woocommerce_profile_sync'), 10, 2);
+			add_action('woocommerce_api_update_customer_data', array(&$this, 'woocommerce_profile_update'), 10, 2);
+			add_action('woocommerce_checkout_update_user_meta', array(&$this, 'woocommerce_profile_sync'), 10, 2);
+			
 		}
 		
 	}
@@ -532,18 +555,6 @@ class MysqlDirectoryService {
 	}
 	
 	/**
-	 *	Creates a user profile in external database when Woocommerce creates a customer.
-	 */
-	public function woocommerce_created_customer( $customer_id, $new_customer_data, $password_generated ) {
-		$update = false;
-		$user = get_user_by('id', $customer_id);
-		$this->_user_pass = $new_customer_data['password'];
-		$errors = new WP_Error();
-		return $this->sync_back( $errors, $user, $update );
-	}
-	
-	
-	/**
 	 *	Function that creates/updates a user record in external database.
 	 *
 	 *	TODO:	Handle validating password before update.
@@ -555,12 +566,16 @@ class MysqlDirectoryService {
 	 */
 	public function sync_back( &$errors = NULL, $user = NULL, $update = NULL ) {
 		
-		if( !is_object($user) ) return false;
+		if( !is_object($user) ) {
+			$this->_log(1,'mysql-directory-service::sync_back(): $user parameter is not a WP_User intsance.');
+			return false;
+		}
 		if( !is_object($errors) ) $errors = new WP_Error();
 		
 		//	Do nothing if updating a user that is not stored in this directory service.
 		if( $update == true ) {
 			if( get_user_meta($user->ID, 'directory_service', true) != $this->opts['mysqlds_host'] ) {
+				$this->_log(3,'mysql-directory-service::sync_back(): updated user is not stored in mysql directory service.');
 				return true;
 			}
 		}
@@ -576,6 +591,7 @@ class MysqlDirectoryService {
 		if( !isset($user->user_login) || empty($user->user_login) ) {
 			if( !is_object($old_user) || empty($old_user->user_login) ) {
 				$errors->add('mysqlds_create_user_error', __('Username must be provided.', 'mysql-directory-service'));
+				$this->_log(1,'mysql-directory-service::sync_back(): username must be provided.');
 				return false;
 			}
 			$user->user_login = $old_user->user_login;
@@ -599,24 +615,6 @@ class MysqlDirectoryService {
 			//$this->_log(0, 'User password stored from class member.');
 			$fields[$field_password] = md5($this->_user_pass);
 		}
-		/*
-			if( !empty($_POST["user_pass-{$user->ID}"]) ) {	//	UPME post password.
-				$this->_log(0, 'User password stored from UPME post.');
-				$fields[$field_password] = md5($_POST["user_pass-{$user->ID}"]);
-			}
-			elseif( !empty($this->_user_pass) ) {
-				$this->_log(0, 'User password stored from class member.');
-				$fields[$field_password] = md5($this->_user_pass);
-			}
-			elseif( !empty($user->user_pass) ) {
-				$this->_log(0, 'User password stored from user object.');
-				$fields[$field_password] = $user->user_pass;
-			}
-			elseif( !empty($_POST['user_pass']) ) {
-				$this->_log(0, 'User password stored from POST data.');
-				$fields[$field_password] = md5($_POST['user_pass']);
-			}
-		*/
 		if( !empty($user->user_email) ) {
 			$fields[$field_email] = $user->user_email;
 		}
@@ -651,6 +649,7 @@ class MysqlDirectoryService {
 		//	Should never happen but we're being cautious.
 		if( empty($sql_set) ) {
 			$errors->add('mysqlds_connect_error', __('Error while updating/creating user: no values to store in record.', 'mysql-directory-service'));
+			$this->_log(1,'mysql-directory-service::sync_back(): no values to update.');
 			return false;
 		}
 	
@@ -672,15 +671,18 @@ class MysqlDirectoryService {
 		$db_link = mysqli_connect($host, $db_user, $pass, $db);
 		if( $db_link === false ) {
 			$errors->add('mysqlds_connect_error', __('This plugin must be activated on the entire network. Please contact your network administrator.', 'mysql-directory-service').':<br/>'.mysqli_error($db_link));
+			$this->_log(1,'mysql-directory-service::sync_back(): mysql connection error.');
 			return false;
 		}
 		$res = mysqli_query($db_link, $sql);
 		if( $res === false ) {
 			$errors->add('mysqlds_query_error', __("Error while executing query on external database:", 'mysql-directory-service') . "<br/>Query: $sql<br/>" . mysqli_error($db_link));
+			$this->_log(1,'mysql-directory-service::sync_back(): mysql query error.');
 			return false;
 		}
 		elseif( mysqli_affected_rows($db_link) == 0 && $update == false ) {
 			$errors->add('mysqlds_update_error', __("Error while updating external database account:", 'mysql-directory-service') . "<br/>Query: $sql<br/>" . mysqli_error($db_link));
+			$this->_log(1,'mysql-directory-service::sync_back(): query did not update any row.');
 			return false;
 		}
 	
@@ -691,6 +693,126 @@ class MysqlDirectoryService {
 	
 	}
 
+
+	/**
+	 *	Creates a user profile in external database when Woocommerce creates a customer.
+	 */
+	public function woocommerce_created_customer( $customer_id, $new_customer_data, $password_generated ) {
+		$update = false;
+		$user = get_user_by('id', $customer_id);
+		$this->_user_pass = $new_customer_data['user_pass'];
+		$errors = new WP_Error();
+		$res = $this->sync_back( $errors, $user, $update );
+		$this->_log(4,'mysql-directory-service::woocommerce_created_customer');
+		return $res;
+	}
+	
+	/**
+	 *	Synchronizes woocommerce address fields with profile fields.
+	 */
+	public function woocommerce_profile_update($customer_id, $data) {
+		$this->_log(4,'mysql-directory-service::woocommerce_profile_update');
+		$addr_prefix = array(
+				'home_',
+				'shipping_',
+				'billing_'
+		);
+		$addr_fields = array(
+			'address_1',
+			'city',
+			'country',
+			'email',
+			'phone',
+			'postcode',
+			'state'
+		);
+		$source_addr = $data;
+		$target_addr = array();
+		foreach( $addr_prefix as $prefix ) {
+			$value = get_user_meta($customer_id, $prefix . $addr_fields[0], true);
+			if( empty($value) ) {
+				$target_addr[] = $prefix;
+			}
+		}
+		if( !empty($source_addr) && !empty($target_addr) ) {
+			foreach($target_addr as $target) {
+				foreach($addr_fields as $field) {
+					$target_key = $target . $field;
+					$target_value = get_user_meta($customer_id, $target_key, true);
+					if( empty($target_value) ) {
+						$source_key = $source_addr . $field;
+						$source_value = get_user_meta($customer_id, $source_key, true);
+						if( !empty($source_value) ) {
+							update_user_meta($customer_id, $target_key, $source_value);
+						}
+					}
+				}
+			}
+		}
+		elseif( empty($source_addr) ) {
+			$this->_log(3,'mysql-directory-service::woocommerce_profile_update: no source address found.');
+		}
+	}
+	
+	/**
+	 *	Synchronizes woocommerce address fields with profile fields.
+	 */
+	public function woocommerce_profile_sync($user_login, $user) {
+		if( !($user instanceof WP_User) ) {
+			if( is_numeric($user_login) ) {
+				$user = get_user_by('id',$user_login);
+			}
+			else {
+				$user = get_user_by('login',$user_login);
+			}
+		}
+		$this->_log(4,'mysql-directory-service::woocommerce_profile_sync');
+		//update_user_meta($user->ID, 'first_name',rand(1,1000));
+		$addr_prefix = array(
+				'home_',
+				'shipping_',
+				'billing_'
+		);
+		$addr_fields = array(
+			'address_1',
+			'city',
+			'country',
+			'email',
+			'phone',
+			'postcode',
+			'state'
+		);
+		$source_addr = '';
+		$target_addr = array();
+		foreach( $addr_prefix as $prefix ) {
+			$value = get_user_meta($user->ID, $prefix . $addr_fields[0], true);
+			if( empty($value) ) {
+				$target_addr[] = $prefix;
+			}
+			elseif( empty($source_addr) ) {
+				$source_addr = $prefix;
+			}
+		}
+		if( !empty($source_addr) && !empty($target_addr) ) {
+			foreach($target_addr as $target) {
+				foreach($addr_fields as $field) {
+					$target_key = $target . $field;
+					$target_value = get_user_meta($user->ID, $target_key, true);
+					if( empty($target_value) ) {
+						$source_key = $source_addr . $field;
+						$source_value = get_user_meta($user->ID, $source_key, true);
+						if( !empty($source_value) ) {
+							update_user_meta($user->ID, $target_key, $source_value);
+						}
+					}
+				}
+			}
+		}
+		elseif( empty($source_addr) ) {
+			$this->_log(3,'mysql-directory-service::woocommerce_profile_sync: no source address found.');
+		}
+	}
+	
 	/**
 	 *	Adds blog options to blog/site, called by WP's plugin activation process via "register_activation_hook".
 	 */
@@ -1175,15 +1297,21 @@ class MysqlDirectoryService {
 	 *	Overrides Wordpress password check with internal database for external users.
 	 */
 	public function override_password_check($check, $password, $hash, $user_id) {
-		$err = $this->errors->get_error_code();
-		if( empty($err) ) {
-			$check = true;
-			return $check;	//	Should never happen since user already authenticated through this class.
-		}
-		else {
-			$check = false;
+		
+		// Always use local password handling for user_id 1 (admin)
+		if ($user_id == 1) {
 			return $check;
 		}
+		
+		//	Do not let wordpress authenticate locally users from external database.
+		$host = get_user_meta($user_id, 'directory-service', true);
+		if( $host == $this->opts['mysqlds_host'] ) {
+			return false;
+		}
+		else {
+			return $check;
+		}
+		
 	}
 	
 	/**
@@ -1663,19 +1791,21 @@ class MysqlDirectoryService {
 			if( strlen($request_url) < strlen($blog_url) || substr($request_url, 0, strlen($blog_url)) != $blog_url ) {
 				return;
 			}
-		
+			
 			//	List of allowed url in the blog domain where no redirect is performed.
 			$allowed_urls = array(
 					$blog_url . '/wp-login.php?action=logout',			//	Logout
 					get_permalink($upme_options['profile_page_id']),	//	UPME profile page
-					WC()->cart->get_checkout_url()						//	Woocommerce checkout
+					WC()->cart->get_checkout_url(),						//	Woocommerce checkout
+					WC()->cart->get_cart_url(),						//	Woocommerce cart
+					$blog_url . '/boutique'						//	Woocommerce shop
 			);
 			
 			//	Match request url against allowed urls.
-			$do_redirect = false;
+			$do_redirect = true;
 			foreach( $allowed_urls as $url ) {
 				if( strlen($request_url) >= strlen($url) && substr($request_url, 0, strlen($url)) == $url ) {
-					$do_redirect = true;
+					$do_redirect = false;
 					break;
 				}
 			}
